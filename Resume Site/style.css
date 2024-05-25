@@ -101,6 +101,7 @@ li.level3 {
 .nota {
     justify-self: end;
     color: white;
+    display: inline-block;
     background-color: rgb(165, 165, 165);
     border-radius: 20px;
     padding: 3px 10px;
