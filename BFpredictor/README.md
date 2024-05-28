@@ -1,0 +1,7 @@
+# Body Fat prediction
+
+Quantifying health with a numerical value is an effective way to demonstrate an individual's well-being and to track progress over time during a training regimen or diet. For many years, the Body Mass Index (BMI) has been widely used for this purpose. However, BMI is increasingly falling out of favor for individual health assessment as it fails to distinguish between different components of body composition, such as fat, muscle, and bone mass. Consequently, BMI can misrepresent an individual's health status by treating all mass equally, whether in deficiency or excess.
+
+In recent years, Body Fat (BF) percentage has become a more common metric as it specifically measures the proportion of fat relative to the rest of the body. Unlike BMI, which is calculated simply by dividing weight by height squared, determining body fat percentage is significantly more complex. One method involves determining an individual's body density, which requires submerging the person in water to measure the displacement and thereby calculate body volume. The individual's weight is then measured, and their density is calculated. This density is used in Siri's formula to estimate body fat percentage.
+
+Given the complexity of accurately calculating BF, developing an alternative method would be highly beneficial. So in this project it is aimed a way to find the body fat of a individual by indirect mesurements.
