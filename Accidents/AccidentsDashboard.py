@@ -8,6 +8,7 @@ import geopandas as gpd
 import folium
 from streamlit_folium import st_folium
 import plotly.express as px
+from shapely.geometry import Point
 
 st.set_page_config(layout="wide")
 
@@ -51,13 +52,13 @@ col1, col2, col3, col4 = st.columns(4)
 width, height = 1000, 300
 data = acidentes.resample('d').count().reset_index()
 fig = px.line(data, x = 'momento', y = 'br', labels={'momento': 'Dia', 'br': 'Total acidentes'},  width=width, height=height)
-if(date_f.day-date_i.day)>0:
+if(date_f-date_i).days>0:
     col1.plotly_chart(fig)
 
 
 data = acidentes.groupby('dia_semana').count().reset_index()
 fig = px.line(data, x = 'dia_semana', y = 'br', labels={'dia_semana': 'semana', 'br': 'Total acidentes'},  width=width, height=height)
-if(date_f.week-date_i.week)>0 or (date_i.week == 52 and date_f.week==52):
+if(date_f-date_i).days>6 :
     col2.plotly_chart(fig)
 
 data = acidentes.groupby(acidentes.index.month).count().reset_index()
@@ -72,7 +73,8 @@ col4.plotly_chart(fig)
 
 
 
-col5, col6, col7 = st.columns(3)
+# col5, col6, col7 = st.columns(3)
+col5, col6, col7 = st.columns([2, 1, 1], gap = 'large')
 
 data = acidentes.causa_acidente.value_counts().head(10)
 fig = px.bar(data, orientation='h', labels={'causa_acidente': 'Causa acidente', 'value': 'Total acidentes'})
@@ -85,10 +87,31 @@ fig.update_yaxes(categoryorder='total ascending')
 col5.plotly_chart(fig)
 
 
-gdf =gpd.read_file('Accidents/data/states-br.json')
-m = folium.Map(location=[gdf.geometry.centroid.y.mean()-2, gdf.geometry.centroid.x.mean()-5], zoom_start=3.7)
-folium.GeoJson(gdf).add_to(m)
+# col6.write(acidentes.tipo_veiculo.value_counts())
+col6.metric(':blue[ilesos]', acidentes.ilesos.sum())
+col6.metric('feridos leves', acidentes.feridos_leves.sum())
+col6.metric(':orange[feridos graves]', acidentes.feridos_graves.sum())
+col6.metric(':red[mortos]', acidentes.mortos.sum())
 
-# Display the map in Streamlit
-with col7:
-    st_folium(m)
+
+
+gdf = gpd.read_file('Accidents/data/states-br.json')
+
+geometry = [Point(xy) for xy in zip(acidentes['longitude'], acidentes['latitude'])]
+gdf_acidentes = gpd.GeoDataFrame(geometry=geometry).set_crs(epsg=32723, inplace=True)
+
+fig, ax = plt.subplots(1, 1)
+ax.set_facecolor((0,0,0,0))
+fig.patch.set_alpha(0.0)
+gdf.plot(ax=ax, facecolor="none", edgecolor="white")
+# gdf_acidentes.plot(ax=ax)
+
+sns.kdeplot(data = acidentes.reset_index(), x='longitude', y = 'latitude', ax=ax, levels= 5)
+ax.axis('off')
+col7.pyplot(fig)
+# m = folium.Map(location=[gdf.geometry.centroid.y.mean()-2, gdf.geometry.centroid.x.mean()-5], zoom_start=3.7)
+# # folium.GeoJson(gdf).add_to(m)
+# folium.GeoJson(gdf_acidentes).add_to(m)
+# # Display the map in Streamlit
+# with col7:
+#     st_folium(m)
